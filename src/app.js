@@ -1,24 +1,32 @@
-const express = require("express")
+const express = require("express");
+const { adminAuth, userAuth } = require("./middlewares/authadmin");
 
-const app = express()
+const app = express();
 
-app.use("/",(req,res)=>{
-    res.send("Works for all")
-})
+app.use("/admin", adminAuth);
+app.use("/user", userAuth);
 
-app.use("/about",(req,res)=>{
-    res.send("About us page")
-})
+app.get("/user",(req, res, next) => {
+  res.send({ message: "User data fetched successfully" });
+});
 
-app.use("/home", (req, res) => {
-  res.send("Welcome to the home page!")
-})
+app.get("/admin/getAllData", (req, res, next) => {
+    res.send({ message: "All data fetched successfully" });
+});
 
-app.use("/dashboard",(req,res)=>{
-    res.send("Welcome to the dashboard!")
-})
+app.delete("/admin/getAllData", (req, res, next) => {
+  res.send({ message: "All data deleted successfully" });
+});
+
+app.post("/user/:userId/:name/:location", (req, res, next) => {
+  console.log(req.params);
+  res.send({
+    userId: req.params.userId,
+    firstName: req.params.name,
+    location: req.params.location,
+  });
+});
 
 app.listen(7777, () => {
-  console.log("Server is running on port 7777")
-})
-
+  console.log("Server is running on port 7777");
+});
