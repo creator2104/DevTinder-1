@@ -1,6 +1,6 @@
 const adminAuth =  (req, res, next) => {
   // Logic of authorization of admin
-  const token = "xyz    ";
+  const token = "xyz";
   const isAdminAuthorize = token === "xyz";
   if(!isAdminAuthorize){
     res.status(401).send({ message: "Unauthorized access" });
