@@ -11,7 +11,7 @@ app.post("/signup",async (req, res) => {
     await user.save();
     res.send("User signed up successfully");
   } catch (error) {
-    res.status(500).send("Error signing up user: " + error.messageN);
+    res.status(500).send("Error signing up user: " + error.message);
   }
 });
 
@@ -30,12 +30,33 @@ app.get("/user",async(req,res)=>{
   }
 })
 
+app.delete("/user", async (req, res) => {
+  const { userId } = req.body;
+  try {
+    await User.findByIdAndDelete(userId);
+    res.send("User deleted successfully");
+  } catch (error) {
+    res.status(400).send("Something went wrong: " + error.message);
+  }
+});
+
 app.get("/feed",async(req,res)=>{
   try {
     const users = await User.find({});
     res.send(users);
   } catch (error) {
     res.status(500).send("Error fetching feed: " + error.message);
+  }
+})
+
+app.patch("/user",async(req,res)=>{
+  const userId = req.body.userId;
+  const data = req.body
+  try{
+    await User.findByIdAndUpdate(userId, data);
+    res.send("User updated successfully");
+  } catch (error) {
+    res.status(400).send("Error updating user: " + error.message);
   }
 })
 
