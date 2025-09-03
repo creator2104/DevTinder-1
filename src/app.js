@@ -1,13 +1,14 @@
 const express = require("express");
-const {connectDB} = require("./config/database");
+const { connectDB } = require("./config/database");
 const app = express();
 const User = require("./models/user");
+const { ReturnDocument } = require("mongodb");
 
-app.use(express.json())
+app.use(express.json());
 
-app.post("/signup",async (req, res) => {
+app.post("/signup", async (req, res) => {
   const user = new User(req.body);
-  try{
+  try {
     await user.save();
     res.send("User signed up successfully");
   } catch (error) {
@@ -15,20 +16,19 @@ app.post("/signup",async (req, res) => {
   }
 });
 
-app.get("/user",async(req,res)=>{
-   const userEmail = req.body.emailId
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.emailId;
   try {
-    const user = await User.find({emailId : userEmail});
-    if(user.length === 0){
+    const user = await User.find({ emailId: userEmail });
+    if (user.length === 0) {
       res.status(404).send("User not found");
-    }
-    else{
+    } else {
       res.send(user);
     }
   } catch (error) {
-    res.status(400).send("Something went wrong"+error.message);
+    res.status(400).send("Something went wrong" + error.message);
   }
-})
+});
 
 app.delete("/user", async (req, res) => {
   const { userId } = req.body;
@@ -40,25 +40,44 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.get("/feed",async(req,res)=>{
+app.get("/feed", async (req, res) => {
   try {
     const users = await User.find({});
     res.send(users);
   } catch (error) {
     res.status(500).send("Error fetching feed: " + error.message);
   }
-})
+});
 
-app.patch("/user",async(req,res)=>{
+app.patch("/user", async (req, res) => {
   const userId = req.body.userId;
-  const data = req.body
-  try{
-    await User.findByIdAndUpdate(userId, data);
+  const data = req.body;
+  try {
+    const ALLOWED_UPDATES = [
+      "password",
+      "age",
+      "gender",
+      "photoUrl",
+      "about",
+      "skills",
+    ];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Invalid updates!");
+    }
+    await User.findByIdAndUpdate(
+      userId,
+      data,
+      { runValidators: true },
+      { returnDocument: "after" }
+    );
     res.send("User updated successfully");
   } catch (error) {
     res.status(400).send("Error updating user: " + error.message);
   }
-})
+});
 
 connectDB()
   .then(() => {
@@ -70,4 +89,3 @@ connectDB()
   .catch((error) => {
     console.error("Database connection failed:", error);
   });
-
