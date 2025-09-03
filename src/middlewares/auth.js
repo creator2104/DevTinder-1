@@ -10,8 +10,6 @@ const adminAuth =  (req, res, next) => {
   }
 }
 
-module.exports = {adminAuth};
-
 const userAuth =  (req, res, next) => {
   // Logic of authorization of user
   const token = "abc";

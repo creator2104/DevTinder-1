@@ -26,4 +26,4 @@ const userSchema = new Schema({
 });
 
 module.exports = mongoose.model("User", userSchema);
-    
+// model is used to create new instances of User
