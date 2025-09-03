@@ -49,8 +49,8 @@ app.get("/feed", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
   try {
     const ALLOWED_UPDATES = [
@@ -66,6 +66,9 @@ app.patch("/user", async (req, res) => {
     );
     if (!isUpdateAllowed) {
       throw new Error("Invalid updates!");
+    }
+    if(data?.skills.length > 5){
+      throw new Error("Cannot have more than 5 skills");
     }
     await User.findByIdAndUpdate(
       userId,

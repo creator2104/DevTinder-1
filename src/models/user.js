@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const validator = require("validator")
 
 const userSchema = new Schema({
     firstName: {
@@ -16,12 +17,22 @@ const userSchema = new Schema({
         lowercase: true,
         required: true,
         trim:true,
-        unique: true
+        unique: true,
+        validate(value){
+            if(!validator.isEmail(value)){
+                throw new Error("Invalid email address"+value);
+            }
+        }
     },
     password: {
         type: String,
         trim:true,
-        required: true
+        required: true,
+          validate(value){
+            if(!validator.isStrongPassword(value)){
+                throw new Error("Create strong password"+value);
+            }
+        }
     },
     age: {
         trim:true,
@@ -39,9 +50,13 @@ const userSchema = new Schema({
     },
     photoUrl :{
         trim:true,
-        type: String
+        type: String,
+          validate(value){
+            if(!validator.isURL(value)){
+                throw new Error("Invalid URL"+value);
+            }
+        }
     },
-    about:{
     about:{
         trim:true,
         type: String
@@ -52,7 +67,7 @@ const userSchema = new Schema({
     }
 
 }
-},{timestamps:true});
+,{timestamps:true});
 
 module.exports = mongoose.model("User", userSchema);
 // model is used to create new instances of User    
