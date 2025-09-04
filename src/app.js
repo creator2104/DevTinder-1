@@ -5,11 +5,15 @@ const User = require("./models/user");
 const { ReturnDocument } = require("mongodb");
 const { validateSignUpData } = require("./utils/signUpValidation");
 const bcrypt = require("bcrypt");
+var cookieParser = require('cookie-parser')
 const cors = require("cors");
 const { validateLoginData } = require("./utils/loginValidation");
-app.use(cors());
+var jwt = require('jsonwebtoken');
+const user = require("./models/user");
 
+app.use(cors());
 app.use(express.json());
+app.use(cookieParser())
 
 app.post("/signup", async (req, res) => {
   try {
@@ -39,9 +43,38 @@ app.post("/login", async (req, res) =>{
     if(!isPasswordValid){
       throw new Error("Invalid credentials");
     }
+    // create a jwt token
+    const token = await jwt.sign({ userId: user._id }, "PER6565FECT@QATEST43543", { expiresIn: "1h" });
+    // Add the token to cookie and send it to the client
+    res.cookie("token", token, { httpOnly: true });
     res.send("User logged in successfully");
   }catch (error) {
     res.status(500).send("ERROR : " + error.message);
+  }
+})
+
+app.get("/profile",async (req,res)=>{
+  try{
+  // I want to validate my jwt here 
+  const cookies =  req.cookies;
+  const { token } = cookies;
+  if(!token){
+    return res.status(401).send("Unauthorized: No token provided");
+  }
+  // validate the token 
+  const validateToken = jwt.verify(token,"PER6565FECT@QATEST43543")
+  // console.log(validateToken);
+  const {userId} = validateToken;
+  // console.log("my Logged in user is : "+ userId);
+  const user = await User.findById(userId)
+  if(!user){
+    return res.status(404).send("User not found");
+  }
+  console.log(user);
+  // console.log(cookies);
+  res.send(user)}
+  catch(error){
+    res.status(401).send("Unauthorized: Invalid token " + error.message);
   }
 })
 
