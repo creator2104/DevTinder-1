@@ -10,6 +10,7 @@ const cors = require("cors");
 const { validateLoginData } = require("./utils/loginValidation");
 var jwt = require('jsonwebtoken');
 const user = require("./models/user");
+const { userAuth } = require("./middlewares/auth");
 
 app.use(cors());
 app.use(express.json());
@@ -39,39 +40,21 @@ app.post("/login", async (req, res) =>{
     if(!user){
       throw new Error("User not found");
     } 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password);
     if(!isPasswordValid){
       throw new Error("Invalid credentials");
     }
-    // create a jwt token
-    const token = await jwt.sign({ userId: user._id }, "PER6565FECT@QATEST43543", { expiresIn: "1h" });
-    // Add the token to cookie and send it to the client
-    res.cookie("token", token, { httpOnly: true });
+    const token = await user.getJWT();
+    res.cookie("token", token, { httpOnly: true , expires : new Date(Date.now() + 86400000)});
     res.send("User logged in successfully");
   }catch (error) {
     res.status(500).send("ERROR : " + error.message);
   }
 })
 
-app.get("/profile",async (req,res)=>{
+app.get("/profile",userAuth, async (req,res)=>{
   try{
-  // I want to validate my jwt here 
-  const cookies =  req.cookies;
-  const { token } = cookies;
-  if(!token){
-    return res.status(401).send("Unauthorized: No token provided");
-  }
-  // validate the token 
-  const validateToken = jwt.verify(token,"PER6565FECT@QATEST43543")
-  // console.log(validateToken);
-  const {userId} = validateToken;
-  // console.log("my Logged in user is : "+ userId);
-  const user = await User.findById(userId)
-  if(!user){
-    return res.status(404).send("User not found");
-  }
-  console.log(user);
-  // console.log(cookies);
+  const user = req.user;
   res.send(user)}
   catch(error){
     res.status(401).send("Unauthorized: Invalid token " + error.message);
@@ -79,7 +62,7 @@ app.get("/profile",async (req,res)=>{
 })
 
 app.get("/user", async (req, res) => {
-  const userEmail = req.body.emailId;
+  const userEmail = req.user.emailId;
   try {
     const user = await User.find({ emailId: userEmail });
     if (user.length === 0) {
@@ -91,6 +74,11 @@ app.get("/user", async (req, res) => {
     res.status(400).send("Something went wrong" + error.message);
   }
 });
+
+app.post("/sendConnectionRequest",userAuth , async (req, res)=>{
+  const user = req.user;
+  res.send(user.firstName+" sent you a connection request");
+})
 
 app.delete("/user", async (req, res) => {
   const { userId } = req.body;
