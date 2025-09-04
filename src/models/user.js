@@ -55,7 +55,8 @@ const userSchema = new Schema({
             if(!validator.isURL(value)){
                 throw new Error("Invalid URL"+value);
             }
-        }
+        },
+        default: "https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png"
     },
     about:{
         trim:true,
