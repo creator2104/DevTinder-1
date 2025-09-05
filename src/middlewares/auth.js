@@ -7,7 +7,7 @@ const   userAuth =  async (req, res, next) => {
     if(!token){
       res.status(401).send({ message: "Unauthorized access" });
     }
-    const decodedObj = jwt.verify(token, "PER6565FECT@QATEST43543")
+    const decodedObj = jwt.verify(token, process.env.JWT_SECRET)
     if(!decodedObj){
       res.status(401).send({ message: "Unauthorized access" });
   }

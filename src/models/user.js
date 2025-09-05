@@ -74,7 +74,7 @@ const userSchema = new Schema({
 
 userSchema.methods.getJWT = function(){
     const user = this;
-    const token = jwt.sign({ userId: this._id }, "PER6565FECT@QATEST43543", { expiresIn: "7d" });
+    const token = jwt.sign({ userId: this._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY });
     return token;
 }
 

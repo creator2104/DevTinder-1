@@ -22,7 +22,7 @@ app.post("/signup", async (req, res) => {
     validateSignUpData(req);
     // Encrypt the password
     const { firstName , lastName , emailId , password } = req.body; 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, parseInt(process.env.PASSWORD_SALT_ROUNDS));
     // Create a new user
     const user = new User({ firstName, lastName, emailId, password: passwordHash });
     await user.save();
@@ -45,7 +45,7 @@ app.post("/login", async (req, res) =>{
       throw new Error("Invalid credentials");
     }
     const token = await user.getJWT();
-    res.cookie("token", token, { httpOnly: true , expires : new Date(Date.now() + 86400000)});
+    res.cookie("token", token, { httpOnly: true , expires : new Date(Date.now() + parseInt(process.env.COOKIE_EXPIRY)) });
     res.send("User logged in successfully");
   }catch (error) {
     res.status(500).send("ERROR : " + error.message);
@@ -135,8 +135,8 @@ app.patch("/user/:userId", userAuth , async (req, res) => {
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
-    app.listen(7777, () => {
-      console.log("Server is running on port 7777");
+    app.listen(process.env.PORT, () => {
+      console.log("Server is running on port " + process.env.PORT);
     });
   })
   .catch((error) => {
