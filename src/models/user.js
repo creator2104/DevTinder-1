@@ -72,19 +72,18 @@ const userSchema = new Schema({
 }
 ,{timestamps:true});
 
-userSchema.methods.getJWT = async function(){
+userSchema.methods.getJWT = function(){
     const user = this;
-    const token = await jwt.sign({ userId: this._id }, "PER6565FECT@QATEST43543", { expiresIn: "7d" });
+    const token = jwt.sign({ userId: this._id }, "PER6565FECT@QATEST43543", { expiresIn: "7d" });
     return token;
 }
 
-userSchema.methods.validatePassword = async function(passwordInputByUser){
+userSchema.methods.validatePassword = function(passwordInputByUser){
     const user = this;
-    const passwordHash = user.password;
-
-    const isPasswordValid = await bcrypt.compare(passwordInputByUser, passwordHash);
+    const passwordHash = user.this.password;
+    const isPasswordValid = bcrypt.compare(passwordInputByUser, passwordHash);
     return isPasswordValid;
 }
 
 module.exports = mongoose.model("User", userSchema);
-// model is used to create new instances of User    
+// model is used to create new instances of User

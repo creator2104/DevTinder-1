@@ -61,8 +61,8 @@ app.get("/profile",userAuth, async (req,res)=>{
   }
 })
 
-app.get("/user", async (req, res) => {
-  const userEmail = req.user.emailId;
+app.get("/user", userAuth , async (req, res) => {
+   const userEmail = req.query.emailId; 
   try {
     const user = await User.find({ emailId: userEmail });
     if (user.length === 0) {
@@ -80,7 +80,7 @@ app.post("/sendConnectionRequest",userAuth , async (req, res)=>{
   res.send(user.firstName+" sent you a connection request");
 })
 
-app.delete("/user", async (req, res) => {
+app.delete("/user", userAuth , async (req, res) => {
   const { userId } = req.body;
   try {
     await User.findByIdAndDelete(userId);
@@ -90,7 +90,7 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-app.get("/feed", async (req, res) => {
+app.get("/feed", userAuth , async (req, res) => {
   try {
     const users = await User.find({});
     res.send(users);
@@ -99,7 +99,7 @@ app.get("/feed", async (req, res) => {
   }
 });
 
-app.patch("/user/:userId", async (req, res) => {
+app.patch("/user/:userId", userAuth , async (req, res) => {
   const userId = req.params?.userId;
   const data = req.body;
   try {
