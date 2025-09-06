@@ -2,15 +2,13 @@ const express = require("express");
 const { connectDB } = require("./config/database");
 const app = express();
 const User = require("./models/user");
-const { ReturnDocument } = require("mongodb");
-const { validateSignUpData } = require("./utils/signUpValidation");
-const bcrypt = require("bcrypt");
 var cookieParser = require('cookie-parser')
 const cors = require("cors");
-const { validateLoginData } = require("./utils/loginValidation");
-var jwt = require('jsonwebtoken');
-const user = require("./models/user");
-const { userAuth } = require("./middlewares/auth");
+const { userAuth } = require("./middlewares/authMiddleware");
+
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
 
 app.use(cors());
 app.use(express.json());

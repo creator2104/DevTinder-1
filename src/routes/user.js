@@ -1,5 +1,7 @@
 const express = require('express');
 const userRouter = express.Router();
+const User = require("../models/user");
+const { userAuth } = require("../middlewares/authMiddleware");
 
 userRouter.get("/user", userAuth , async (req, res) => {
    const userEmail = req.query.emailId; 
