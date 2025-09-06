@@ -5,9 +5,7 @@ const bcrypt = require("bcrypt");
 
 authRouter.post("/signup", async (req, res) => {
   try {
-    // validating the data
     validateSignUpData(req);
-    // Encrypt the password
     const { firstName , lastName , emailId , password } = req.body; 
     const passwordHash = await bcrypt.hash(password, parseInt(process.env.PASSWORD_SALT_ROUNDS));
     // Create a new user
@@ -38,6 +36,5 @@ authRouter.post("/login", async (req, res) =>{
     res.status(500).send("ERROR : " + error.message);
   }
 })
-
 
 module.exports = authRouter
